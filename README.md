@@ -16,7 +16,11 @@ import Schema
 
 def decode(payload) do
     parse payload do
-        schema type: tlv, w_tag: 8, w_len: 16 do
+        ## the content of the payload is of tlv format,
+        ## the first 1 bytes contains the `tag` of the tlv,
+        ## the next 2 bytes contains the length of the value,
+        ## and following the length field is the number of bytes specified by the length.
+        schema type: tlv, w_tag: 1, w_len: 2 do
             tlv tag: 0x01, type: "int", as: "timestamp"
             tlv tag: 0x02, type: "string", as: "event"
         end
@@ -27,7 +31,6 @@ end
 Given
 ```
 payload = <<1, 4, 92,32,170,241, 2, 5, 104,101,108,108,111>>
-
 ```
 Then the function call `decode(payload)` would produce the following map:
 ```
@@ -56,7 +59,7 @@ import Schema
 
 def encode(payload) do
     unparse payload do
-        schema type: tlv, w_tag: 8, w_len: 16 do
+        schema type: tlv, w_tag: 1, w_len: 2 do
             tlv tag: 0x01, type: "int", as: "timestamp"
             tlv tag: 0x02, type: "string", as: "event"
         end
